@@ -1,16 +1,16 @@
 /**
  * DISCLAIMER
- * This project is NOT about Chess! 
+ * This project is NOT about Chess!
  * The topic of Chess was chosen for educational purposes to demonstrate W3C Standard Custom Elements, CSS Grid and Native JavaScript DOM performance
- * 
- * License: UNlicense - https://unlicense.org/
- * 
- * 
+ *
+ * License: UN license - https://unlicense.org/
+ *
+ *
  * Autonomous Custom Elements:
  *  <chessmeister-board>
  *  <board-layer>
  *
- * Extended Buil-In Elements:
+ * Extended Built-In Elements:
  *  <img is=white-pawn />
  *  <img is=black-rook />
  *  <img is=...-knight />
@@ -33,7 +33,7 @@ const ChesslyBoardSquareBlack = ChesslySquareNameSpace + "black";
 let isOdd = x => (x === 0 ? false : (x & -x) === 1); // isOdd returns T/F for negative and possible values
 
 /**
- * chunck an Array in equal sizes
+ * chunk an Array in equal sizes
  * @param {array} arr - input array 
  * @param {number} size
  */
@@ -1181,6 +1181,8 @@ customElements.define(ChesslyBoardLayer, class extends HTMLElement {
 customElements.define(
   ChesslyNameSpace + "-board",
   class extends HTMLElement {
+    private _initialpieces_in_lightDOM: string;
+    private _initfen: boolean;
     static get observedAttributes() {
       return [___ATTR_FEN___, ___ATTR_STATIC___];
     }
