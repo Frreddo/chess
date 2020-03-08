@@ -3,10 +3,12 @@
         "allowJs": true,
         "target": "es2016",
         "noImplicitAny": true,
-        "noImplicitThis": true,
-        "strictNullChecks": true
+        "noImplicitThis": true
     },
     "include": [
-        "./src/**/*"
+        "src/**/*"
+    ],
+    "exclude": [
+        "src/elements.chessmeister.ts"
     ]
 }

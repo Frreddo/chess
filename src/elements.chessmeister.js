@@ -252,22 +252,6 @@ attrs = CE.getAttributeNames() // attribute names to be processed
 ), init // optional initial/default parameters  attr-key:value
 );
 /**
- * create properties on Custom Element from (observed)attributes
- * @param {DOMelement} CE - Custom Element this reference
- * @param {array} attrs - optional parameter, default gets CE.constructor.observedAttributes
- */
-let make_Object_properties_from_attributes = (CE, attrs = CE.constructor.observedAttributes) => attrs.map(attr => Object.defineProperty(CE, attr, {
-    get() {
-        return CE.getAttribute(attr);
-    },
-    set(val) {
-        val == undefined
-            ? CE.removeAttribute(attr)
-            : CE.setAttribute(attr, val);
-    },
-    configurable: true
-}));
-/**
  * returns SVG string for chess piece
  * @param {*} {is:'white-king'}
  */
@@ -276,7 +260,7 @@ function SVG_chesspiece({ is, // white-pawn, black-rook etc
 outline = "#666", // red outline
 detailcolor = "#888", // small lines in pawn and rook, circles in king
 //width and height
-size = 900, // larger value is smaller piece org:993 
+size = 900, // larger value is smaller piece org:993
 translate = "20,0", // To center piece in square  org:50,0
 circlesize = 50, 
 // 0 = white , 1 = black
@@ -286,7 +270,7 @@ fillcolors = ["gold", "silver"] // fill queen crown-circles and other details
     let color = is.includes(___WHITE___) ? 0 : 1;
     let stopcolors = piececolors[color];
     let fillcolor = fillcolors[color];
-    let circle = (cx, cy, r, fcolor = fillcolor) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fcolor}"></circle>`;
+    let circle = (cx, cy, r, fcolor = fillcolor) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fcolor}"/>`;
     let svg = `data:image/svg+xml` +
         `,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='${size}' height='${size}'>` +
         `${`<defs><linearGradient id='a'><stop offset='50%' stop-color='#${stopcolors[0]}'/><stop offset='100%' stop-color='#${stopcolors[1]}'/></linearGradient></defs>` +
@@ -328,7 +312,7 @@ fillcolors = ["gold", "silver"] // fill queen crown-circles and other details
                     circle(440, 737, circlesize / 2) +
                     circle(550, 743, circlesize / 2)
             }[is.split("-")[1]]}</g></svg>`; //get piece type as object key: pawn,rook,...
-    //note: escape() function can be used but is officialy deprecated
+    //note: escape() function can be used but is officially deprecated
     return svg
         .replace(/</g, "%3C")
         .replace(/>/g, "%3E")
@@ -345,10 +329,10 @@ fillcolors = ["gold", "silver"] // fill queen crown-circles and other details
     ___PIECE_BISHOP___,
     ___PIECE_QUEEN___,
     ___PIECE_KING___
-].map(piecename => {
-    let piece_is = color + "-" + piecename; // white-pawn, white-rook, ...
+].map(pieceName => {
+    let piece_is = color + "-" + pieceName; // white-pawn, white-rook, ...
     //register Forsyth-Edward-Notations
-    let fen = piecename == ___PIECE_KNIGHT___ ? "n" : piecename[0]; // prnbqk
+    let fen = pieceName == ___PIECE_KNIGHT___ ? "n" : pieceName[0]; // prnbqk
     if (color == ___WHITE___)
         fen = fen.toUpperCase(); // white : PRNBQK
     FEN_translation_Map.set(piece_is, fen); // white-king -> K
@@ -1174,7 +1158,7 @@ customElements.define(ChesslyNameSpace + "-board", class extends HTMLElement {
     show_moves_piece_in_square(from_square) {
         this.clear_board_moves();
         if (this.is_interactive) {
-            //if (from_square) 
+            //if (from_square)
             [...this.layerPieces.children].map(piece => {
                 piece._show_piece_moves(from_square, [this.layerMoves]);
             });

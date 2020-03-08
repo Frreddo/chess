@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="src/elements.chessmeister.ts"></script>
+    <script src="src/elements.chessmeister.js"></script>
+    <script src="src/test.js" defer></script>
+    <script src="src/square.js" defer></script>
 </head>
 <body>
+<caraibes-grid></caraibes-grid>
 <chessmeister-board
-       fen="rnbqkbnr/
+        fen="rnbqkbnr/
             pppppppp/
             8/
             8/
@@ -15,6 +18,20 @@
             8/
             PPPPPPPP/
             RNBQKBNR" >
-    </chessmeister-board>
+</chessmeister-board>
+<h1>Life cycle callbacks test</h1>
+
+<div>
+    <button class="add">Add custom-square to DOM</button>
+    <button class="update">Update attributes</button>
+    <button class="remove">Remove custom-square from DOM</button>
+</div>
+
+
+<img src="src/logo.png">
+
+<caraibes-grid color="BL"></caraibes-grid>
+
+<img is="caraibes-bribe" at="A"></imgcaraibes-bribe>
 </body>
 </html>
