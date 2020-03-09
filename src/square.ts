@@ -4,15 +4,13 @@ const CUSTOM_AREA = 'caraibes-area';
 const CUSTOM_BRIBE = 'caraibes-bribe';
 
 // Custom elements - Class names
-const GRID = 'grid';
 const AREA_LAYER = 'area_layer';
-const AREA = 'area';
 const BRIBE_LAYER = 'bribe_layer';
-const BRIBE = 'bribe';
 
 
 // Custom elements - Attribute names
 const BRIBE_VALUE = 'bribe-value';
+const BRIBE_SETUP = 'bribe-setup';
 const AT = 'at';
 const COLOR = 'color';
 
@@ -30,37 +28,53 @@ const BLUE_CODE = 'BL';
 const GREEN_CODE = 'GR';
 const RED_CODE = 'RE';
 const YELLOW_CODE = 'YE';
-const BLUE_HTML = 'blue';
-const GREEN_HTML = 'green';
-const RED_HTML = 'red';
-const YELLOW_HTML = 'yellow';
+const BLUE_CSS_NAME = '--blue-player-color';
+const GREEN_CSS_NAME = '--green-player-color';
+const RED_CSS_NAME = '--red-player-color';
+const YELLOW_CSS_NAME = '--yellow-player-color';
+const BLUE_CSS_VALUE = '#09f';
+const GREEN_CSS_VALUE = '#060';
+const RED_CSS_VALUE = '#900';
+const YELLOW_CSS_VALUE = '#ff0';
 
-function getHTMLColor(color: string) {
+function getColorCSSName(color: string) {
     switch (color) {
         case BLUE_CODE:
-            return BLUE_HTML;
+            return BLUE_CSS_NAME;
         case YELLOW_CODE:
-            return YELLOW_HTML;
+            return YELLOW_CSS_NAME;
         case RED_CODE:
-            return RED_HTML;
+            return RED_CSS_NAME;
         case GREEN_CODE:
-            return GREEN_HTML;
+            return GREEN_CSS_NAME;
+    }
+}
+
+function getColorCSSValue(color: string) {
+    switch (color) {
+        case BLUE_CODE:
+            return BLUE_CSS_VALUE;
+        case YELLOW_CODE:
+            return YELLOW_CSS_VALUE;
+        case RED_CODE:
+            return RED_CSS_VALUE;
+        case GREEN_CODE:
+            return GREEN_CSS_VALUE;
     }
 }
 
 // =============================================== Bribe ===============================================================
 class Bribe extends HTMLImageElement {
-    // Attributes: AT, BRIBE_VALUE, COLOR
+    // Attributes: COLOR, BRIBE_VALUE, AT
     static get observedAttributes() {
         return [AT];
     }
     constructor() {
         super();
-        this.setAttribute('class', BRIBE);
     }
     connectedCallback() {
         this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><ellipse cx='44' cy='61' rx='30' ry='23' fill='#fafa55'></svg>";
-        this.style.background = this.getAttribute(COLOR);
+        this.style.background = getColorCSSValue(this.getAttribute(COLOR));
     }
 }
 
@@ -72,7 +86,6 @@ class Area extends HTMLElement {
     // Attributes: AT
     constructor() {
         super();
-        this.setAttribute('class', AREA);
     }
 }
 
@@ -80,41 +93,53 @@ customElements.define(CUSTOM_AREA, Area);
 
 // =============================================== Grid ================================================================
 class Grid extends HTMLElement {
-    // Attributes:
+    // Attributes: COLOR, BRIBE_SETUP
     constructor() {
         super();
         const shadow = this.attachShadow({mode: 'open'});
 
         const grid = document.createElement('div');
-        grid.setAttribute('class', GRID);
         shadow.appendChild(grid);
 
+        // Areas
         const areaLayer = document.createElement('div');
         areaLayer.setAttribute('class', AREA_LAYER);
         grid.appendChild(areaLayer);
 
         for(let bribe_name of BRIBE_LIST){
             let area = document.createElement(CUSTOM_AREA);
-            area.setAttribute(COLOR, this.getAttribute(COLOR));
             area.setAttribute(AT, bribe_name);
-            area.setAttribute(BRIBE_VALUE, bribe_name);
             areaLayer.appendChild(area);
         }
 
+        for(let target_name of TARGET_LIST){
+            let area = document.createElement(CUSTOM_AREA);
+            area.setAttribute(AT, target_name);
+            areaLayer.appendChild(area);
+        }
+
+        // Bribes
         const bribeLayer = document.createElement('div');
         bribeLayer.setAttribute('class', BRIBE_LAYER);
         grid.appendChild(bribeLayer);
 
         for(let bribe_name of BRIBE_LIST) {
             let bribe = document.createElement(CUSTOM_BRIBE);
+            bribe.setAttribute(COLOR, this.getAttribute(COLOR));
+            bribe.setAttribute(BRIBE_VALUE, bribe_name);
             bribe.setAttribute(AT, bribe_name);
-            bribe.setAttribute(COLOR, getHTMLColor(this.getAttribute('color')));
             bribeLayer.appendChild(bribe);
         }
 
         const style = document.createElement('style');
         style.textContent = `
-            .${GRID} {
+            :root {
+                ${BLUE_CSS_NAME}  : ${BLUE_CSS_VALUE};
+                ${GREEN_CSS_NAME} : ${GREEN_CSS_VALUE};
+                ${RED_CSS_NAME}   : ${RED_CSS_VALUE};
+                ${YELLOW_CSS_NAME}: ${YELLOW_CSS_VALUE};
+            }
+            ${CUSTOM_GRID} {
             }
             .${AREA_LAYER} {
                 background: silver;
@@ -128,7 +153,7 @@ class Grid extends HTMLElement {
                 grid-template-areas: ${getGridAreas()};
             }
             .${BRIBE_LAYER} {
-                background: silver;
+                background: var(${GREEN_CSS_NAME});
                 padding: 10px;
                 width: 400px;
                 margin: auto;
@@ -138,22 +163,37 @@ class Grid extends HTMLElement {
                 grid-template-rows: repeat(2, 50px);
                 grid-template-areas: ${getGridAreas()};
             }
-            .${AREA} {
+            ${CUSTOM_AREA} {
                 width: 20px;
                 height: 15px;
-                background-color: 'grey';
-                grid-area: ${this.getAttribute(AT)};
-            }
-            .${AREA}:before {
-                content: ${this.getAttribute(AT)};
-                color: red;
-                font-size: 1em;
-            }           
+                background-color: grey;
+            }       
         `;
-        for(let area in TARGET_LIST){
+        for(let area of TARGET_LIST){
             style.textContent += `
             [${AT}="${area}"] {
                 grid-area: ${getGridArea(area)};
+            }
+            `
+            style.textContent += `
+            ${CUSTOM_AREA}[${AT}="${area}"]:before {
+                content: "${area}";
+                color: red;
+                font-size: 1em;
+            }
+            `
+        }
+        for(let area of BRIBE_LIST){
+            style.textContent += `
+            [${AT}="${area}"] {
+                grid-area: ${getGridArea(area)};
+            }
+            `
+            style.textContent += `
+            ${CUSTOM_AREA}[${AT}="${area}"]:before {
+                content: "${area}";
+                color: red;
+                font-size: 1em;
             }
             `
         }
