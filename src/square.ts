@@ -33,7 +33,7 @@ const GREEN_CSS_NAME = '--green-player-color';
 const RED_CSS_NAME = '--red-player-color';
 const YELLOW_CSS_NAME = '--yellow-player-color';
 const BLUE_CSS_VALUE = '#09f';
-const GREEN_CSS_VALUE = '#060';
+const GREEN_CSS_VALUE = 'green';
 const RED_CSS_VALUE = '#900';
 const YELLOW_CSS_VALUE = '#ff0';
 
@@ -73,7 +73,8 @@ class Bribe extends HTMLImageElement {
         super();
     }
     connectedCallback() {
-        this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><ellipse cx='44' cy='61' rx='30' ry='23' fill='#fafa55'></svg>";
+        this.src = "logo.png";
+        //this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><ellipse cx='44' cy='61' rx='30' ry='23' fill='#fafa55'></svg>";
         this.style.background = getColorCSSValue(this.getAttribute(COLOR));
     }
 }
@@ -87,6 +88,28 @@ class Area extends HTMLElement {
     constructor() {
         super();
     }
+    static getCSS() {
+        let cssContent = `
+            ${CUSTOM_AREA} {
+                background: var(${BLUE_CSS_VALUE});
+                line-height: 40px;
+                padding: 0;
+                border: white 5px solid;
+                border-radius: 25px;
+            }
+        `;
+        let areaList = TARGET_LIST.concat(BRIBE_LIST);
+        for(let area of areaList){
+            cssContent += `
+            ${CUSTOM_AREA}[${AT}="${area}"]:before {
+                content: "${area}";
+                color: red;
+                font-size: 1em;
+            }
+            `;
+        }
+        return cssContent;
+    }
 }
 
 customElements.define(CUSTOM_AREA, Area);
@@ -98,6 +121,12 @@ class Grid extends HTMLElement {
         super();
         const shadow = this.attachShadow({mode: 'open'});
 
+        // Style
+        const style = document.createElement('style');
+        style.textContent = Grid.getCSS() + Area.getCSS();
+        shadow.appendChild(style);
+
+        // Grid
         const grid = document.createElement('div');
         shadow.appendChild(grid);
 
@@ -131,15 +160,14 @@ class Grid extends HTMLElement {
             bribeLayer.appendChild(bribe);
         }
 
-        const style = document.createElement('style');
-        style.textContent = `
+    }
+    static getCSS() {
+        let cssContent = `
             :root {
                 ${BLUE_CSS_NAME}  : ${BLUE_CSS_VALUE};
                 ${GREEN_CSS_NAME} : ${GREEN_CSS_VALUE};
                 ${RED_CSS_NAME}   : ${RED_CSS_VALUE};
                 ${YELLOW_CSS_NAME}: ${YELLOW_CSS_VALUE};
-            }
-            ${CUSTOM_GRID} {
             }
             .${AREA_LAYER} {
                 background: silver;
@@ -153,7 +181,8 @@ class Grid extends HTMLElement {
                 grid-template-areas: ${getGridAreas()};
             }
             .${BRIBE_LAYER} {
-                background: var(${GREEN_CSS_NAME});
+                
+                background: var(${YELLOW_CSS_NAME}, blue);
                 padding: 10px;
                 width: 400px;
                 margin: auto;
@@ -163,42 +192,16 @@ class Grid extends HTMLElement {
                 grid-template-rows: repeat(2, 50px);
                 grid-template-areas: ${getGridAreas()};
             }
-            ${CUSTOM_AREA} {
-                width: 20px;
-                height: 15px;
-                background-color: grey;
-            }       
         `;
-        for(let area of TARGET_LIST){
-            style.textContent += `
+        let areaList = TARGET_LIST.concat(BRIBE_LIST);
+        for(let area of areaList){
+            cssContent += `
             [${AT}="${area}"] {
                 grid-area: ${getGridArea(area)};
             }
-            `
-            style.textContent += `
-            ${CUSTOM_AREA}[${AT}="${area}"]:before {
-                content: "${area}";
-                color: red;
-                font-size: 1em;
-            }
-            `
+            `;
         }
-        for(let area of BRIBE_LIST){
-            style.textContent += `
-            [${AT}="${area}"] {
-                grid-area: ${getGridArea(area)};
-            }
-            `
-            style.textContent += `
-            ${CUSTOM_AREA}[${AT}="${area}"]:before {
-                content: "${area}";
-                color: red;
-                font-size: 1em;
-            }
-            `
-        }
-
-        shadow.appendChild(style);
+        return cssContent;
     }
 }
 
