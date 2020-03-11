@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Load external SVG</title>
+</head>
+
+<body>
+    <h1>Load external SVG</h1>
+    <p>In this example, we will load an external SVG and manipulate it with JavaScript. For that to happen, three steps
+        are required :</p>
+    <ol>
+        <li>Add meaningful IDs to the SVG elements (or group of elements) that will be manipulated with JavaScript.</li>
+        <li>Include the svg using the <strong>object</strong> tag.</li>
+        <li>Add an event listener for the svg to be loaded before executing JavaScript instructions on it.</li>
+    </ol>
+    <hr>
+    <p>Try to click on the different elements of the face to see their names.</p>
+    <!-- Include the external SVG -->
+    <object id="faceSVG" type="image/svg+xml" data="face.svg" style="height: 500px"></object>
+    <object id="faceSVG2" type="image/svg+xml" data="face.svg" style="height: 500px"></object>
+    <h2 id="feedback">You have not clicked yet!</h2>
+    <!-- Add the script -->
+    <script>
+        //Identify the object as any other HTML element
+        var svg = document.getElementById("faceSVG");
+        //Identify the output element in the page
+        var feedback = document.getElementById("feedback");
+        //Since it is an external element, we need to wait for it to be loaded with an event listener
+        svg.addEventListener("load", function () {
+            //At this point, the DOM of the SVG can be accessed with the .contentDocument property
+            var face = svg.contentDocument;
+            //Create an array with the different IDs of the elements
+            var faceElements = ['hat', 'glasses', 'moustaches', 'beard'];
+            //Iterate through the elements
+            faceElements.forEach(function (el) {
+                //Identify the current element of the iteration
+                var current = face.getElementById(el);
+                //Associate a mouseover event-listener to change the pointer
+                current.addEventListener("mouseover", function () {
+                    current.style.cursor = "pointer";
+                });
+                //Associate a click event-listener to show the feedback
+                current.addEventListener("click", function () {
+                    feedback.innerHTML = "You clicked on the " + el.toUpperCase();
+                });
+            });
+        });
+        let face2 = document.getElementById('faceSVG2');
+        face2.addEventListener("load", function() {
+            let face2content = face2.contentDocument;
+            let mouth = face2content.getElementById('path3430');
+            mouth.setAttribute("fill", 'green');
+        });
+    </script>
+
+</body>
+
+</html>

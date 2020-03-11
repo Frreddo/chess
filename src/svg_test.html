@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Template Example</title>
+        <style media="screen">
+            svg {
+                margin: auto;
+                background: lavender;
+            }
+            g {
+                stroke:black;
+                stroke-width:2px;
+                fill:none;
+            }
+            #item1, #item2 {
+                width: 300px;
+                height: 500px;
+                background: lemonchiffon;
+            }
+            #item2 {
+                background: lightsalmon;
+            }
+            #clone1, #clone2 {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <svg width="0" height="0" >
+            <defs>
+            <g id="template">
+               <line x1=" 2" y1="2" x2=" 7" y2="7" ></line>
+               <line x1="25" y1="2" x2="20" y2="7" ></line>
+               <path class="botLeft" d="m 1,26 6,-6" ></path>
+               <path class="botRite" d="m 26,26 -6,-6" ></path>
+               <rect x="1" y="1" rx="3" ry="3" width="25" height="25" ></rect>
+               <path class="rectIn" d="m 7,7 0,13 13,0 0,-13 z" style="fill:gray;" ></path>
+            </g>
+            </defs>
+        </svg>
+        <div id="item1">
+            <svg id="svg1"></svg>
+        </div>
+        <div id="item2">
+            <svg id="svg2"></svg>
+        </div>
+
+        <script type="text/javascript">
+            let temp = document.getElementById("template");
+
+            let clone1 = temp.cloneNode(true);
+
+            let svg1 = document.getElementById('svg1');
+            svg1.appendChild(clone1);
+
+            let clone2 = temp.cloneNode(true);
+            clone2.setAttribute("transform", "translate(50,0)");
+            let rect = document.querySelector("#")
+
+
+            let svg2 = document.getElementById('svg2');
+            svg2.appendChild(clone2);
+
+        </script>
+    </body>
+</html>
