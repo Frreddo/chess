@@ -9,6 +9,6 @@
         "src/**/*"
     ],
     "exclude": [
-        "src/elements.chessmeister.ts"
+      "src/elements.chessmeister.js"
     ]
 }
