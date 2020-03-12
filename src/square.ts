@@ -22,6 +22,9 @@ function getGridAreas(): string {
     return "\"" + BRIBE_LIST.map(getGridArea).join(" ") + "\" \"" + TARGET_LIST.map(getGridArea).join(" ") + "\"";
 }
 
+// Drag and drop
+const gridDnDType : string = "text/grid-bribe-value";
+
 // Colors
 const BLUE_CODE = 'BL';
 const GREEN_CODE = 'GR';
@@ -72,6 +75,9 @@ class Bribe extends HTMLObjectElement {
         super();
         this.type = 'image/svg+xml';
         this.data = 'bribe.svg';
+        this.draggable = true;
+        this.ondragstart = dragStartHandler;
+        this.ondragend = dragEndHandler;
     }
     connectedCallback() {
         console.log('start of connectedCallback' + this.contentDocument);
@@ -86,10 +92,48 @@ class Bribe extends HTMLObjectElement {
             bribeText.innerHTML = this.getAttribute(BRIBE_VALUE);
         })
     }
-
+    static getCSS(): string {
+        let cssContent = `
+            ${CUSTOM_BRIBE} .dragged {
+                display: none;
+            }
+        `;
+        return cssContent;
+    }
 }
 
 customElements.define(CUSTOM_BRIBE, Bribe, {extends: 'object'});
+
+function dragStartHandler(e: DragEvent): void {
+  let target = e.target;
+  if((target) && (target instanceof Bribe)){
+    // Target is a bribe element
+    e.stopPropagation();
+    target.classList.add("dragged");
+    const bribeValue = target.getAttribute(BRIBE_VALUE);
+    if(!bribeValue){
+        console.log('No value for the bribe element');
+    } else {
+      if(!e.dataTransfer){
+        console.log('No dataTransfer for the event');
+      } else {
+        e.dataTransfer.setData(gridDnDType, bribeValue);
+        e.dataTransfer.effectAllowed = "move";
+        // Set up destination areas (all targets, plus start position for this value)
+          // TODO modify aspect of areas during drag
+      }
+    }
+  }
+}
+
+function dragEndHandler(e: DragEvent): void {
+  let target = e.target;
+  if ((target) && (target instanceof Bribe)) {
+    target.classList.remove("dragged");
+    // restore drop areas
+    // TODO restore aspect of areas after drag
+  }
+}
 
 // =============================================== Area ================================================================
 class Area extends HTMLElement {
@@ -133,7 +177,7 @@ class Grid extends HTMLElement {
 
         // Style
         const style = document.createElement('style');
-        style.textContent = Grid.getCSS() + Area.getCSS();
+        style.textContent = Grid.getCSS() + Area.getCSS() + Bribe.getCSS();
         shadow.appendChild(style);
 
         // Grid
