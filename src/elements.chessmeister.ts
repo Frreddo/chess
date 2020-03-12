@@ -1063,7 +1063,7 @@ customElements.define(ChesslyBoardLayer, class extends HTMLElement {
   // squares(selector = "*")
   // add_board_layer_piece(piece_is, square, append = true)
 
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return [];
   }
   constructor() {

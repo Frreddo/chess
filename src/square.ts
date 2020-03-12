@@ -5,14 +5,13 @@ const CUSTOM_BRIBE = 'caraibes-bribe';
 
 // Custom elements - Class names
 const AREA_LAYER = 'area_layer';
-const BRIBE_LAYER = 'bribe_layer';
 
 
 // Custom elements - Attribute names
 const BRIBE_VALUE = 'bribe-value';
 const BRIBE_SETUP = 'bribe-setup';
 const AT = 'at';
-const COLOR = 'color';
+const BRIBE_COLOR = 'bribe-color';
 
 // Areas
 const BRIBE_LIST = ["-1", "0", "1", "2", "3", "4", "5"];
@@ -33,7 +32,7 @@ const GREEN_CSS_NAME = '--green-player-color';
 const RED_CSS_NAME = '--red-player-color';
 const YELLOW_CSS_NAME = '--yellow-player-color';
 const BLUE_CSS_VALUE = '#09f';
-const GREEN_CSS_VALUE = 'green';
+const GREEN_CSS_VALUE = '#060';
 const RED_CSS_VALUE = '#900';
 const YELLOW_CSS_VALUE = '#ff0';
 
@@ -64,23 +63,33 @@ function getColorCSSValue(color: string) {
 }
 
 // =============================================== Bribe ===============================================================
-class Bribe extends HTMLImageElement {
+class Bribe extends HTMLObjectElement {
     // Attributes: COLOR, BRIBE_VALUE, AT
     static get observedAttributes() {
         return [AT];
     }
     constructor() {
         super();
+        this.type = 'image/svg+xml';
+        this.data = 'bribe.svg';
     }
     connectedCallback() {
-        this.src = "logo.png";
-        //this.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><ellipse cx='44' cy='61' rx='30' ry='23' fill='#fafa55'></svg>";
-        this.style.background = getColorCSSValue(this.getAttribute(COLOR));
+        console.log('start of connectedCallback' + this.contentDocument);
+        this.addEventListener("load",function () {
+            console.log('start of load event' + this.contentDocument);
+            // Set background color and bribe value in SVG element
+            let bribeContent = this.contentDocument;
+            let bribeBackground = bribeContent.getElementById("bribe-background");
+            let cssColor = getColorCSSValue(this.getAttribute(BRIBE_COLOR));
+            bribeBackground.setAttribute("fill", cssColor);
+            let bribeText = bribeContent.getElementById("bribe-text");
+            bribeText.innerHTML = this.getAttribute(BRIBE_VALUE);
+        })
     }
+
 }
 
-customElements.define(CUSTOM_BRIBE, Bribe, {extends: 'img'});
-
+customElements.define(CUSTOM_BRIBE, Bribe, {extends: 'object'});
 
 // =============================================== Area ================================================================
 class Area extends HTMLElement {
@@ -91,8 +100,7 @@ class Area extends HTMLElement {
     static getCSS() {
         let cssContent = `
             ${CUSTOM_AREA} {
-                background: var(${BLUE_CSS_VALUE});
-                line-height: 40px;
+                background: lavender;
                 padding: 0;
                 border: white 5px solid;
                 border-radius: 25px;
@@ -103,8 +111,10 @@ class Area extends HTMLElement {
             cssContent += `
             ${CUSTOM_AREA}[${AT}="${area}"]:before {
                 content: "${area}";
-                color: red;
-                font-size: 1em;
+                color: gray;
+                line-height: 80px;
+                font-size: 4em;
+                text-align: center;
             }
             `;
         }
@@ -148,16 +158,16 @@ class Grid extends HTMLElement {
         }
 
         // Bribes
-        const bribeLayer = document.createElement('div');
-        bribeLayer.setAttribute('class', BRIBE_LAYER);
-        grid.appendChild(bribeLayer);
-
         for(let bribe_name of BRIBE_LIST) {
-            let bribe = document.createElement(CUSTOM_BRIBE);
-            bribe.setAttribute(COLOR, this.getAttribute(COLOR));
+            let bribe = document.createElement('object', {'is': CUSTOM_BRIBE});
+            bribe.setAttribute(BRIBE_COLOR, this.getAttribute(BRIBE_COLOR));
+            console.log('bribe: ' + bribe_name + 'color: ' + bribe.getAttribute(BRIBE_COLOR));
             bribe.setAttribute(BRIBE_VALUE, bribe_name);
             bribe.setAttribute(AT, bribe_name);
-            bribeLayer.appendChild(bribe);
+            console.log('bribe ' + bribe_name + 'before appendChild: ' + bribe.contentDocument);
+
+            areaLayer.appendChild(bribe);
+
         }
 
     }
@@ -172,24 +182,12 @@ class Grid extends HTMLElement {
             .${AREA_LAYER} {
                 background: silver;
                 padding: 10px;
-                width: 400px;
+                width: 1110px;
                 margin: auto;
                 display: grid;
                 grid-gap: 10px;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: repeat(2, 50px);
-                grid-template-areas: ${getGridAreas()};
-            }
-            .${BRIBE_LAYER} {
-                
-                background: var(${YELLOW_CSS_NAME}, blue);
-                padding: 10px;
-                width: 400px;
-                margin: auto;
-                display: grid;
-                grid-gap: 10px;
-                grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: repeat(2, 50px);
+                grid-template-rows: repeat(2, 200px);
                 grid-template-areas: ${getGridAreas()};
             }
         `;
