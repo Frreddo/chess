@@ -5,6 +5,7 @@ const CUSTOM_BRIBE = 'caraibes-bribe';
 
 // Custom elements - Class names
 const AREA_LAYER = 'area_layer';
+const BRIBE = 'bribe';
 
 
 // Custom elements - Attribute names
@@ -75,14 +76,13 @@ class Bribe extends HTMLObjectElement {
         super();
         this.type = 'image/svg+xml';
         this.data = 'bribe.svg';
+        this.setAttribute('class', BRIBE);
         this.draggable = true;
-        this.ondragstart = dragStartHandler;
+        this.addEventListener('dragstart', dragStartHandler);
         this.ondragend = dragEndHandler;
     }
     connectedCallback() {
-        console.log('start of connectedCallback' + this.contentDocument);
         this.addEventListener("load",function () {
-            console.log('start of load event' + this.contentDocument);
             // Set background color and bribe value in SVG element
             let bribeContent = this.contentDocument;
             let bribeBackground = bribeContent.getElementById("bribe-background");
@@ -93,46 +93,50 @@ class Bribe extends HTMLObjectElement {
         })
     }
     static getCSS(): string {
-        let cssContent = `
-            ${CUSTOM_BRIBE} .dragged {
+        return `
+            .${BRIBE} {
+                user-select: none;
+            }
+            .${BRIBE} .dragged {
                 display: none;
             }
         `;
-        return cssContent;
     }
 }
 
 customElements.define(CUSTOM_BRIBE, Bribe, {extends: 'object'});
 
 function dragStartHandler(e: DragEvent): void {
-  let target = e.target;
-  if((target) && (target instanceof Bribe)){
-    // Target is a bribe element
-    e.stopPropagation();
-    target.classList.add("dragged");
-    const bribeValue = target.getAttribute(BRIBE_VALUE);
-    if(!bribeValue){
-        console.log('No value for the bribe element');
-    } else {
-      if(!e.dataTransfer){
-        console.log('No dataTransfer for the event');
-      } else {
-        e.dataTransfer.setData(gridDnDType, bribeValue);
-        e.dataTransfer.effectAllowed = "move";
-        // Set up destination areas (all targets, plus start position for this value)
-          // TODO modify aspect of areas during drag
-      }
+    console.log('Entering dragstart event');
+    let target = e.target;
+    if((target) && (target instanceof Bribe)){
+        // Target is a bribe element
+        e.stopPropagation();
+        target.classList.add("dragged");
+        const bribeValue = target.getAttribute(BRIBE_VALUE);
+        if(!bribeValue){
+            console.log('No value for the bribe element');
+        } else {
+            if(!e.dataTransfer){
+                console.log('No dataTransfer for the event');
+            } else {
+                e.dataTransfer.setData(gridDnDType, bribeValue);
+                e.dataTransfer.effectAllowed = "move";
+                // Set up destination areas (all targets, plus start position for this value)
+                // TODO modify aspect of areas during drag
+            }
+        }
     }
-  }
 }
 
 function dragEndHandler(e: DragEvent): void {
-  let target = e.target;
-  if ((target) && (target instanceof Bribe)) {
-    target.classList.remove("dragged");
-    // restore drop areas
-    // TODO restore aspect of areas after drag
-  }
+    console.log('Entering dragend event');
+    let target = e.target;
+    if ((target) && (target instanceof Bribe)) {
+        target.classList.remove("dragged");
+        // restore drop areas
+        // TODO restore aspect of areas after drag
+    }
 }
 
 // =============================================== Area ================================================================
@@ -205,10 +209,8 @@ class Grid extends HTMLElement {
         for(let bribe_name of BRIBE_LIST) {
             let bribe = document.createElement('object', {'is': CUSTOM_BRIBE});
             bribe.setAttribute(BRIBE_COLOR, this.getAttribute(BRIBE_COLOR));
-            console.log('bribe: ' + bribe_name + 'color: ' + bribe.getAttribute(BRIBE_COLOR));
             bribe.setAttribute(BRIBE_VALUE, bribe_name);
             bribe.setAttribute(AT, bribe_name);
-            console.log('bribe ' + bribe_name + 'before appendChild: ' + bribe.contentDocument);
 
             areaLayer.appendChild(bribe);
 

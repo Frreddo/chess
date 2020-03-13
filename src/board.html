@@ -3,22 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Board</title>
-    <script src="elements.chessmeister.js"></script>
-    <script src="test.js" defer></script>
     <script src="square.js" defer></script>
 </head>
 <body>
 
-<chessmeister-board
-        fen="rnbqkbnr/
-            pppppppp/
-            8/
-            8/
-            8/
-            8/
-            PPPPPPPP/
-            RNBQKBNR" >
-</chessmeister-board>
 <h1>Life cycle callbacks test</h1>
 
 <div>
@@ -30,6 +18,8 @@
 
 
 <caraibes-grid bribe-color="BL"></caraibes-grid>
+<object is="caraibes-bribe" bribe-color="RE" bribe-value="2"></object>
+<object type="image/svg+xml" data="bribe.svg" draggable="true" alt="">
 
 </body>
 </html>
