@@ -66,32 +66,60 @@ function getColorCSSValue(color: string) {
     }
 }
 
+function getBribeSVG(color: string, value: string): string {
+    return `
+        <svg version="1.1"
+            xmlns="http://www.w3.org/2000/svg" width="150" height="200">
+            <g>
+                <rect class="bribe-background" x="5" y="5" rx="20" ry="20" width="140" height="190" fill="${getColorCSSValue(color)}"/>
+                <text class="bribe-text" x="75" y="115" font-size="40" text-anchor="middle" fill="black">${value}</text>
+            </g>
+        </svg>
+    `;
+}
+let wrapper = document.getElementById('wrapper');
+wrapper.innerHTML = getBribeSVG('BL', '3');
+
 // =============================================== Bribe ===============================================================
-class Bribe extends HTMLObjectElement {
+class Bribe extends HTMLElement {
     // Attributes: COLOR, BRIBE_VALUE, AT
     static get observedAttributes() {
         return [AT];
     }
     constructor() {
         super();
-        this.type = 'image/svg+xml';
-        this.data = 'bribe.svg';
-        this.setAttribute('class', BRIBE);
-        this.draggable = true;
-        this.addEventListener('dragstart', dragStartHandler);
-        this.ondragend = dragEndHandler;
+        // this.setAttribute('class', BRIBE);
+        // let svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+        // svg.textContent = Bribe.getSVG();
+        // this.appendChild(svg);
+        //
+        // this.draggable = true;
+        // this.addEventListener('dragstart', dragStartHandler);
+        // this.ondragend = dragEndHandler;
     }
     connectedCallback() {
-        this.addEventListener("load",function () {
-            // Set background color and bribe value in SVG element
-            let bribeContent = this.contentDocument;
-            let bribeBackground = bribeContent.getElementById("bribe-background");
-            let cssColor = getColorCSSValue(this.getAttribute(BRIBE_COLOR));
-            bribeBackground.setAttribute("fill", cssColor);
-            let bribeText = bribeContent.getElementById("bribe-text");
-            bribeText.innerHTML = this.getAttribute(BRIBE_VALUE);
-        })
+        // Set background color and bribe value in SVG element
+        let bribe = document.querySelector(`${CUSTOM_BRIBE}[${AT}=${this.getAttribute(AT)}]`);
+        console.log(bribe.textContent);
+        // let bribeBackground = bribeContent.getElementById("bribe-background");
+        // let cssColor = getColorCSSValue(this.getAttribute(BRIBE_COLOR));
+        // bribeBackground.setAttribute("fill", cssColor);
+        // let bribeText = bribeContent.getElementById("bribe-text");
+        // bribeText.innerHTML = this.getAttribute(BRIBE_VALUE);
     }
+    static getSVG(): string {
+        return `
+            <svg version="1.1"
+                xmlns="http://www.w3.org/2000/svg" width="150" height="200">
+                <g>
+                    <rect class="bribe-background" x="5" y="5" rx="20" ry="20" width="140" height="190" fill="ivory"/>
+                    <text class="bribe-text" x="75" y="115" font-size="40" text-anchor="middle" fill="blue">XX</text>
+                </g>
+            </svg>
+        `;
+    }
+
+
     static getCSS(): string {
         return `
             .${BRIBE} {
@@ -104,7 +132,7 @@ class Bribe extends HTMLObjectElement {
     }
 }
 
-customElements.define(CUSTOM_BRIBE, Bribe, {extends: 'object'});
+customElements.define(CUSTOM_BRIBE, Bribe);
 
 function dragStartHandler(e: DragEvent): void {
     console.log('Entering dragstart event');
@@ -188,6 +216,7 @@ class Grid extends HTMLElement {
         const grid = document.createElement('div');
         shadow.appendChild(grid);
 
+
         // Areas
         const areaLayer = document.createElement('div');
         areaLayer.setAttribute('class', AREA_LAYER);
@@ -207,7 +236,7 @@ class Grid extends HTMLElement {
 
         // Bribes
         for(let bribe_name of BRIBE_LIST) {
-            let bribe = document.createElement('object', {'is': CUSTOM_BRIBE});
+            let bribe = document.createElement(CUSTOM_BRIBE);
             bribe.setAttribute(BRIBE_COLOR, this.getAttribute(BRIBE_COLOR));
             bribe.setAttribute(BRIBE_VALUE, bribe_name);
             bribe.setAttribute(AT, bribe_name);

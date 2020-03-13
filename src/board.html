@@ -19,7 +19,14 @@
 
 <caraibes-grid bribe-color="BL"></caraibes-grid>
 <object is="caraibes-bribe" bribe-color="RE" bribe-value="2"></object>
-<object type="image/svg+xml" data="bribe.svg" draggable="true" alt="">
+<div id="wrapper" draggable="true" style="height: 300px; width: 200px; background-color: lemonchiffon ">
+
+</div>
+<img id='bribe-as-img' src="bribe.svg" draggable="true" width="150" height="200" alt="" ondragstart="function f() {
+  console.log('Drag start');
+}">
+
+
 
 </body>
 </html>
